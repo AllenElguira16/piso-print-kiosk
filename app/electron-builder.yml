@@ -1,0 +1,12 @@
+appId: com.piso-print-kiosk.nextron
+productName: Piso Print Kiosk
+copyright: Copyright © 2018 Yoshihide Shiono
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - from: .
+    filter:
+      - package.json
+      - app
+publish: null
