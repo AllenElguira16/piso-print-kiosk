@@ -5,7 +5,7 @@ import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 const Board = (() => {
   const board = new five.Board({
-    port: 'COM3'
+    port: 'COM4'
   });
   
   let totalCoins = 0;
@@ -17,19 +17,23 @@ const Board = (() => {
         const coinSlot = new five.Button(7);
       
         coinSlot.on('press', () => {
-          if (!isCoinInserted) {
-            isCoinInserted = true;
-            totalCoins++;
-          }
+          console.log('press');
+
+          totalCoins++;
+          io.emit('coins', { total: totalCoins });
+          // if (!isCoinInserted) {
+          //   isCoinInserted = true;
+          // }
         });
       
-        coinSlot.on('release', () => {
-          if (isCoinInserted) {
-            io.emit('coins', { total: totalCoins });
-            isCoinInserted = false;
-          }
-        })
-      
+        // coinSlot.on('release', () => {
+        //   console.log('release');
+
+        //   if (isCoinInserted) {
+        //     io.emit('coins', { total: totalCoins });
+        //     isCoinInserted = false;
+        //   }
+        // });
       });
     }
   }
