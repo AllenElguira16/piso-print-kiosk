@@ -9,7 +9,6 @@ const Board = (() => {
   });
   
   let totalCoins = 0;
-  let isCoinInserted = false;
   
   return {
     start (io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) {
@@ -17,23 +16,11 @@ const Board = (() => {
         const coinSlot = new five.Button(7);
       
         coinSlot.on('press', () => {
-          console.log('press');
+          console.log('coin inserted');
 
           totalCoins++;
           io.emit('coins', { total: totalCoins });
-          // if (!isCoinInserted) {
-          //   isCoinInserted = true;
-          // }
         });
-      
-        // coinSlot.on('release', () => {
-        //   console.log('release');
-
-        //   if (isCoinInserted) {
-        //     io.emit('coins', { total: totalCoins });
-        //     isCoinInserted = false;
-        //   }
-        // });
       });
     }
   }
