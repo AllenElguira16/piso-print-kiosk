@@ -1,6 +1,6 @@
 import electron from 'electron';
 import type { NextPage } from 'next';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import Step1 from '../components/Step1'
 import Step2 from '../components/Step2'
 import Step3 from '../components/Step3'
@@ -11,14 +11,18 @@ const socket = io('http://localhost:8000');
 
 const Home: NextPage = () => {
   const [currentStep, setStep] = useState(1);
-  const [printInfo, setPrintInfo] = useState({  
+  const [printInfo, setPrintInfo] = useState({
     coupon: 'short',
-    copies: 1
+    copies: 1,
+    pages: 1,
   });
   const [file, setFile] = useState<File>(undefined);
 
   const loadFile = async (event: ChangeEvent<HTMLInputElement>) => {
-    setFile(event.currentTarget.files[0]);
+    const filepath = event.currentTarget.files[0];
+    socket.emit('get-pages', { filepath: filepath.path });
+
+    setFile(filepath);
   }
 
   const onChangeSetPrintInfo = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -28,6 +32,15 @@ const Home: NextPage = () => {
       [name]: value
     });
   }
+
+  useEffect(() => {
+    socket.on('file-loaded', ({ pages }) => {
+      setPrintInfo({
+        ...printInfo,
+        pages
+      })
+    });
+  }, []);
 
   return (
     <>

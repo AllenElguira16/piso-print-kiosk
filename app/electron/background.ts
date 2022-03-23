@@ -25,6 +25,8 @@ if (isProd) {
     await mainWindow.loadURL(`http://localhost:${port}/home`);
     mainWindow.webContents.openDevTools();
   }
+
+  mainWindow.removeMenu();
 })();
 
 app.on('window-all-closed', () => {

@@ -4,6 +4,10 @@ import { Server } from 'socket.io';
 import usbDetect from 'usb-detection';
 import Board from './board';
 import { exec } from 'child_process';
+import path from 'path';
+import fs from 'fs';
+
+const PDFParser = require('pdf2json');
 
 (async () => {
   // Initialize Express Server
@@ -50,7 +54,50 @@ import { exec } from 'child_process';
         if (stdout) console.log(stdout);
 
         socket.emit('start-printing');
+        console.log(`Start Printing: ${args.filepath}`);
       });
     });
+
+    socket.on('open-file', async (args: PrintArgs) => {
+      exec(`Invoke-Item "${args.filepath}"`, {'shell':'powershell.exe'}, async (error, stdout, stderr) => {
+        if (error) console.error(error);
+
+        if (stderr) console.log(stderr);
+        if (stdout) console.log(stdout);
+
+        console.log(`File Opened: ${args.filepath}`);
+      });
+    });
+
+    socket.on('get-pages', async (args: PrintArgs) => {
+      const pdfParser = new PDFParser();
+
+      const filename = path.parse(args.filepath).name;
+      const ext = path.parse(args.filepath).ext;
+
+      if (ext === 'pdf') {
+        pdfParser.loadPDF(args.filepath);
+      } else {
+        exec(`cd ${path.join(__dirname, 'temp')} && "C:\\Program Files\\LibreOffice\\program\\soffice.exe" --convert-to pdf "${args.filepath}"`, async (error, stdout, stderr) => {
+          if (error) console.error(error);
+  
+          if (stderr) console.log(stderr);
+          if (stdout) console.log(stdout);
+  
+          const pdfPath = path.join(__dirname, 'temp', filename + '.pdf');
+  
+          pdfParser.loadPDF(pdfPath);
+  
+          fs.unlinkSync(pdfPath);
+        });
+      }
+
+      pdfParser.on('pdfParser_dataReady', function(data: any) {
+        const pageCount = data.Pages.length;
+        socket.emit('file-loaded', { pages: pageCount });
+      });
+    });
+    
+    
   })
 })();

@@ -5,7 +5,7 @@ import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 const Board = (() => {
   const board = new five.Board({
-    port: 'COM4'
+    port: 'COM5'
   });
   
   let totalCoins = 0;

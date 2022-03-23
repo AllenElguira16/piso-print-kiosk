@@ -13,7 +13,7 @@ const Step1: FC<TProps> = ({nextStep}) => {
         <header className="text-8xl">Hello! Print your document here.</header>
 
         <div className="mt-40">
-          <button className="border-8 border-gray-800 rounded-full right-4 bottom-4 w-48 h-16" onClick={nextStep}>
+          <button className="button-primary" onClick={nextStep}>
             click here to start
           </button>
         </div>
