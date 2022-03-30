@@ -10,6 +10,18 @@ import fs from 'fs';
 const PDFParser = require('pdf2json');
 
 (async () => {
+  const coinState = (() => {
+    let coins = 0;
+    return {
+      getCoins() {
+        return coins;
+      },
+      setCoins(newValue: number) {
+        coins = newValue;
+      }
+    }
+  })();
+
   // Initialize Express Server
   const app = Express();
   // Initialize Main Server with Express
@@ -21,10 +33,7 @@ const PDFParser = require('pdf2json');
     }
   });
   // Start Arduino Interface
-  Board.start(io);
-  // Start all server using port 8000
-  server.listen(8000, () => console.log('server started on port 8000'));
-  io.listen(server);
+  Board.start(io, coinState);
 
   // Listens to any connection from app
   io.on('connection', function (socket) {
@@ -32,6 +41,7 @@ const PDFParser = require('pdf2json');
     usbDetect.startMonitoring();
     // Detect if USB is added
     usbDetect.on('add', () => {
+      coinState.setCoins(0);
       socket.emit('usb-connected');
     });
 
@@ -41,7 +51,7 @@ const PDFParser = require('pdf2json');
         coupon: string;
         copies: number;
       } 
-    } 
+    }
     // If client gives an file and coins enough to print
     // Will start the service
     socket.on('prepare-printing', async (args: PrintArgs) => {
@@ -97,7 +107,10 @@ const PDFParser = require('pdf2json');
         socket.emit('file-loaded', { pages: pageCount });
       });
     });
-    
-    
   })
+
+  // Start all server using port 8000
+  server.listen(8000, () => console.log('server started on port 8000'));
+
+  io.listen(server);
 })();

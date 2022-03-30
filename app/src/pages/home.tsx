@@ -65,7 +65,12 @@ const Home: NextPage = () => {
         <Step4
           start={() => {
             setStep(1);
-            setFile(null);
+            setPrintInfo({
+              coupon: 'short',
+              copies: 1,
+              pages: 1,
+            })
+            setFile(undefined);
           }}
           socket={socket}
           prevStep={() => setStep(currentStep - 1)}
